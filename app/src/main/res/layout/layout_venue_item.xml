@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/card_view"
+    android:layout_gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    card_view:cardUseCompatPadding="true"
+    card_view:cardCornerRadius="4dp"
+    card_view:cardElevation="4dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/ivVenueImage"
+            android:layout_width="144dp"
+            android:layout_height="144dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="false"/>
+
+        <TextView
+            android:id="@+id/tvVenueName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/ivVenueImage"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:layout_margin="4dp"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"/>
+
+        <RelativeLayout
+            android:id="@+id/rlCheckinsCountContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/ivVenueImage"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true">
+
+            <TextView
+                android:id="@+id/tvVenueCheckins"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|end"
+                android:layout_toStartOf="@+id/ivVenueCheckinsIcon"
+                android:layout_centerVertical="true"/>
+
+            <ImageView
+                android:id="@+id/ivVenueCheckinsIcon"
+                android:src="@drawable/ic_venue_checkin_24dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_margin="4dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

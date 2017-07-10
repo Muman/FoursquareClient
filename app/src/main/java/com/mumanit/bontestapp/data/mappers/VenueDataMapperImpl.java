@@ -66,7 +66,7 @@ public class VenueDataMapperImpl implements VenueDataMapper {
 
             if (!photos.items.isEmpty()){
                 FoursquareVenuePhoto photo = photos.items.get(0);
-                venuePhotoUrl = photo.prefix + photo.suffix;
+                venuePhotoUrl = photo.prefix + "320x320" + photo.suffix;
             }
         }
 

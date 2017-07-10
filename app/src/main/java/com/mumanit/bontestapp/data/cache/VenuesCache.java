@@ -1,8 +1,9 @@
-package com.mumanit.bontestapp.data;
+package com.mumanit.bontestapp.data.cache;
 
 import com.mumanit.bontestapp.domain.model.VenueData;
-
 import java.util.List;
+
+import rx.Observable;
 
 /**
  * Created by pmuciek on 7/9/17.
@@ -10,5 +11,5 @@ import java.util.List;
 
 public interface VenuesCache {
     void save(List<VenueData> venueDataList);
-    List<VenueData> load();
+    Observable<List<VenueData>> loadVenues();
 }

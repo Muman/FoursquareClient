@@ -1,0 +1,92 @@
+package com.mumanit.bontestapp.ui.venues;
+
+import android.content.Context;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+import com.mumanit.bontestapp.R;
+import com.mumanit.bontestapp.domain.model.VenueData;
+import com.squareup.picasso.Picasso;
+
+import java.util.List;
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
+/**
+ * Created by pmuciek on 7/9/17.
+ */
+
+public class VenuesListAdapter extends RecyclerView.Adapter<VenuesListAdapter.VenueItemViewHolder> {
+
+    private List<VenueData> mDataset;
+    private Context mContext;
+
+    public VenuesListAdapter(List<VenueData> mDataset, Context mContext) {
+        this.mDataset = mDataset;
+        this.mContext = mContext;
+    }
+
+    public void setData(List<VenueData> venueDatas) {
+        this.mDataset = venueDatas;
+    }
+
+    public List<VenueData> getData() {
+        return mDataset;
+    }
+
+    @Override
+    public VenueItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_venue_item, parent, false);
+
+        return new VenueItemViewHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(final VenueItemViewHolder holder, int position) {
+        bindViews(holder, position);
+    }
+
+    private void bindViews(final VenueItemViewHolder holder, int position) {
+
+        VenueData venue = mDataset.get(position);
+
+        holder.tvVenueCheckins.setText(String.valueOf(venue.checkinsCount));
+        holder.tvVenueName.setText(venue.name);
+
+        if (null != venue.photoUrl) {
+            Picasso.with(mContext).load(venue.photoUrl).into(holder.ivVenueImage);
+        } else {
+            Picasso.with(mContext).load(android.R.drawable.arrow_up_float).into(holder.ivVenueImage);
+        }
+
+    }
+
+    @Override
+    public int getItemCount() {
+        if (null == mDataset) {
+            return 0;
+        }
+
+        return mDataset.size();
+    }
+
+    static class VenueItemViewHolder extends RecyclerView.ViewHolder {
+
+        @Bind(R.id.ivVenueImage)
+        ImageView ivVenueImage;
+        @Bind(R.id.tvVenueName)
+        TextView tvVenueName;
+        @Bind(R.id.tvVenueCheckins)
+        TextView tvVenueCheckins;
+
+        public VenueItemViewHolder(View itemView) {
+            super(itemView);
+
+            ButterKnife.bind(this, itemView);
+        }
+    }
+}

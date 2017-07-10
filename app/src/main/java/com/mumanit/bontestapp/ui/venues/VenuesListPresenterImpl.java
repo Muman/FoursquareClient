@@ -5,9 +5,7 @@ import com.mumanit.bontestapp.domain.GetVenuesInteractor;
 
 import java.util.List;
 
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by pmuciek on 7/8/17.
@@ -43,14 +41,12 @@ public class VenuesListPresenterImpl implements VenuesListPresenter {
         view.showLoading();
 
         venuesInteractor.getVenues()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
                 .subscribe(new Action1<List<VenueData>>() {
                     @Override
                     public void call(List<VenueData> venueDatas) {
                         if (isViewAttached()){
                             view.hideLoading();
-                            view.showVenuesList();
+                            view.showVenuesList(venueDatas);
                         }
                     }
                 }, new Action1<Throwable>() {

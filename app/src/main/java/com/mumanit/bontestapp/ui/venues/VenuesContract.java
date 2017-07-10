@@ -1,5 +1,9 @@
 package com.mumanit.bontestapp.ui.venues;
 
+import com.mumanit.bontestapp.domain.model.VenueData;
+
+import java.util.List;
+
 /**
  * Created by pmuciek on 7/8/17.
  */
@@ -7,7 +11,7 @@ package com.mumanit.bontestapp.ui.venues;
 public class VenuesContract {
 
     public interface VenuesListView {
-        void showVenuesList();
+        void showVenuesList(List<VenueData> venueDataList);
         void showLoading();
         void hideLoading();
         void showError();

@@ -6,6 +6,7 @@ import com.mumanit.bontestapp.ui.MainActivity;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import okhttp3.OkHttpClient;
 
 /**
  * Created by pmuciek on 7/8/17.
@@ -13,5 +14,6 @@ import dagger.Component;
 @Singleton
 @Component(modules = {AppModule.class})
 public interface AppComponent {
+    OkHttpClient okHttpClient();
     void inject(MainActivity mainActivity);
 }

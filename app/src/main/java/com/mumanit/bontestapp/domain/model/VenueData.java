@@ -6,9 +6,9 @@ package com.mumanit.bontestapp.domain.model;
 
 public class VenueData {
 
-    int checkinsCount;
-    String photoUrl;
-    String name;
+    public int checkinsCount;
+    public String photoUrl;
+    public String name;
 
     public VenueData(int checkinsCount, String name, String photoUrl) {
         this.checkinsCount = checkinsCount;

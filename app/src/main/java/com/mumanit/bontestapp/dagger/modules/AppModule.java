@@ -9,8 +9,10 @@ import com.google.gson.GsonBuilder;
 import com.mumanit.bontestapp.dagger.qualifiers.ClientId;
 import com.mumanit.bontestapp.dagger.qualifiers.ClientSecretKey;
 import com.mumanit.bontestapp.dagger.qualifiers.Foursquare;
+import com.mumanit.bontestapp.data.cache.VenuesCache;
 import com.mumanit.bontestapp.data.VenuesDataManager;
 import com.mumanit.bontestapp.data.VenuesDataManagerImpl;
+import com.mumanit.bontestapp.data.cache.VenuesSharedPrefCache;
 import com.mumanit.bontestapp.data.mappers.VenueDataMapper;
 import com.mumanit.bontestapp.data.mappers.VenueDataMapperImpl;
 import com.mumanit.bontestapp.domain.GetVenuesInteractor;
@@ -22,7 +24,9 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import okhttp3.Cache;
 import okhttp3.OkHttpClient;
+import okhttp3.internal.cache.DiskLruCache;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -52,6 +56,7 @@ public class AppModule {
         return new OkHttpClient()
                 .newBuilder()
                 .addNetworkInterceptor(new StethoInterceptor())
+                .cache(new Cache(context.getCacheDir(),250000000))
                 .build();
     }
 
@@ -100,8 +105,8 @@ public class AppModule {
 
     @Singleton
     @Provides
-    VenuesDataManager provideVenuesDataManager(com.mumanit.bontestapp.data.api.FoursquareApi foursquareApi, VenueDataMapper venueDataMapper, @ClientId String clientId, @ClientSecretKey String clientSecret) {
-        return new VenuesDataManagerImpl(foursquareApi, venueDataMapper, clientId, clientSecret);
+    VenuesDataManager provideVenuesDataManager(FoursquareApi foursquareApi, VenueDataMapper venueDataMapper, VenuesCache venuesCache, @ClientId String clientId, @ClientSecretKey String clientSecret) {
+        return new VenuesDataManagerImpl(foursquareApi, venueDataMapper, venuesCache, clientId, clientSecret);
     }
 
     @Singleton
@@ -119,5 +124,11 @@ public class AppModule {
     @Singleton
     VenueDataMapper provideVenueDataMapper() {
         return new VenueDataMapperImpl();
+    }
+
+    @Provides
+    @Singleton
+    VenuesCache provideVenuesCache() {
+        return new VenuesSharedPrefCache();
     }
 }
