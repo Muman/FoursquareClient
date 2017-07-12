@@ -38,7 +38,9 @@ public class VenuesListPresenterImpl implements VenuesListPresenter {
     @Override
     public void loadVenues() {
 
-        view.showLoading();
+        if (isViewAttached()){
+            view.showLoading();
+        }
 
         venuesInteractor.getVenues()
                 .subscribe(new Action1<List<VenueData>>() {

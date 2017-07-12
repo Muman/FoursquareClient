@@ -60,7 +60,7 @@ public class VenuesListAdapter extends RecyclerView.Adapter<VenuesListAdapter.Ve
         if (null != venue.photoUrl) {
             Picasso.with(mContext).load(venue.photoUrl).into(holder.ivVenueImage);
         } else {
-            Picasso.with(mContext).load(android.R.drawable.arrow_up_float).into(holder.ivVenueImage);
+            Picasso.with(mContext).load(android.R.drawable.arrow_up_float).into(holder.ivVenueImage); // TODO: 7/11/17 provide better placeholder
         }
 
     }

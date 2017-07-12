@@ -18,7 +18,7 @@ import com.squareup.picasso.Picasso;
  * Created by pmuciek on 7/8/17.
  */
 
-public class App extends Application{
+public class App extends Application {
 
     private AppComponent component;
 

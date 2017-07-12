@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.facebook.stetho.okhttp3.StethoInterceptor;
+import com.google.android.gms.location.LocationRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mumanit.bontestapp.dagger.qualifiers.ClientId;
@@ -26,7 +27,7 @@ import dagger.Module;
 import dagger.Provides;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
-import okhttp3.internal.cache.DiskLruCache;
+import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -56,7 +57,7 @@ public class AppModule {
         return new OkHttpClient()
                 .newBuilder()
                 .addNetworkInterceptor(new StethoInterceptor())
-                .cache(new Cache(context.getCacheDir(),250000000))
+                .cache(new Cache(context.getCacheDir(), 250000000))
                 .build();
     }
 
@@ -82,21 +83,18 @@ public class AppModule {
         return retrofit.create(FoursquareApi.class);
     }
 
-    @Singleton
     @Provides
     @Foursquare
     String provideFoursquareBaseUrl(){
-        return "https://api.foursquare.com/v2/venues/";
+        return "https://api.foursquare.com/v2/";
     }
 
-    @Singleton
     @Provides
     @ClientSecretKey
     String provideClientSecretKey(){
         return "JCBDNKFN3W1JXAIPSCL4J5Y2HF2ZJJU0NS2N1YJ5CVHBABFW";
     }
 
-    @Singleton
     @Provides
     @ClientId
     String provideClientId(){
@@ -105,8 +103,14 @@ public class AppModule {
 
     @Singleton
     @Provides
-    VenuesDataManager provideVenuesDataManager(FoursquareApi foursquareApi, VenueDataMapper venueDataMapper, VenuesCache venuesCache, @ClientId String clientId, @ClientSecretKey String clientSecret) {
-        return new VenuesDataManagerImpl(foursquareApi, venueDataMapper, venuesCache, clientId, clientSecret);
+    VenuesDataManager provideVenuesDataManager(FoursquareApi foursquareApi,
+                                               VenueDataMapper venueDataMapper,
+                                               VenuesCache venuesCache,
+                                               ReactiveLocationProvider locationProvider,
+                                               @ClientId String clientId,
+                                               @ClientSecretKey String clientSecret) {
+
+        return new VenuesDataManagerImpl(foursquareApi, venueDataMapper, venuesCache, locationProvider, clientId, clientSecret);
     }
 
     @Singleton
@@ -130,5 +134,20 @@ public class AppModule {
     @Singleton
     VenuesCache provideVenuesCache() {
         return new VenuesSharedPrefCache();
+    }
+
+    @Provides
+    @Singleton
+    ReactiveLocationProvider provideLocationProvider(Context context) {
+        return new ReactiveLocationProvider(context);
+    }
+
+    @Provides
+    @Singleton
+    LocationRequest provideLocationRequest() {
+        return LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY)
+                .setNumUpdates(5)
+                .setInterval(30000);
     }
 }

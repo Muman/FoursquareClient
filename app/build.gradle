@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion 25
@@ -18,11 +17,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        targetCompatibility 1.7
+        sourceCompatibility 1.7
+    }
 }
 
 repositories {
     maven { url "https://jitpack.io" }
     maven { url "https://clojars.org/repo/" }
+    maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/' }
 }
 
 dependencies {
@@ -41,13 +45,22 @@ dependencies {
     compile 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.1.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.github.orhanobut:hawk:1.21'
+    compile 'pl.charmas.android:android-reactive-location:0.10@aar'
+    compile 'com.google.android.gms:play-services-location:9.4.0' //you can use newer GMS version if you need
+
+    compile("com.github.hotchemi:permissionsdispatcher:2.4.0") {
+        // if you don't use android.app.Fragment you can exclude support for them
+        exclude module: "support-v13"
+    }
+
+    annotationProcessor "com.github.hotchemi:permissionsdispatcher-processor:2.4.0"
 
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:recyclerview-v7:25.3.1'
     compile 'com.android.support:cardview-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
 
-    apt 'com.google.dagger:dagger-compiler:2.9'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.9'
     provided 'javax.annotation:jsr250-api:1.0'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
