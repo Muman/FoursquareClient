@@ -1,7 +1,7 @@
 package com.mumanit.bontestapp.dagger.modules;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.google.android.gms.location.LocationRequest;

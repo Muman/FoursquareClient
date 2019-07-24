@@ -1,7 +1,7 @@
 package com.mumanit.bontestapp.ui.venues;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +12,7 @@ import com.mumanit.bontestapp.domain.model.VenueData;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -76,11 +76,11 @@ public class VenuesListAdapter extends RecyclerView.Adapter<VenuesListAdapter.Ve
 
     static class VenueItemViewHolder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.ivVenueImage)
+        @BindView(R.id.ivVenueImage)
         ImageView ivVenueImage;
-        @Bind(R.id.tvVenueName)
+        @BindView(R.id.tvVenueName)
         TextView tvVenueName;
-        @Bind(R.id.tvVenueCheckins)
+        @BindView(R.id.tvVenueCheckins)
         TextView tvVenueCheckins;
 
         public VenueItemViewHolder(View itemView) {

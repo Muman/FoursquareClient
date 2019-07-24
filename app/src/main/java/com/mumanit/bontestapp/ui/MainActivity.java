@@ -3,17 +3,16 @@ package com.mumanit.bontestapp.ui;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.location.Location;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
 import com.mumanit.bontestapp.R;
 import com.mumanit.bontestapp.app.App;
 import com.mumanit.bontestapp.domain.model.VenueData;
@@ -23,8 +22,10 @@ import com.mumanit.bontestapp.ui.venues.VenuesListPresenter;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.inject.Inject;
-import butterknife.Bind;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
@@ -39,7 +40,7 @@ import rx.functions.Action1;
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity implements VenuesContract.VenuesListView {
 
-    @Bind(R.id.rvVenuesList)
+    @BindView(R.id.rvVenuesList)
     RecyclerView rvVenuesList;
 
     @Inject
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements VenuesContract.Ve
 
         injectDependencies();
 
-        venuesListLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        venuesListLayoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
         venuesListAdapter = new VenuesListAdapter(new ArrayList<VenueData>(), this);
         rvVenuesList.setLayoutManager(venuesListLayoutManager);
         rvVenuesList.setAdapter(venuesListAdapter);
@@ -77,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements VenuesContract.Ve
     protected void onStart() {
         super.onStart();
 
-        MainActivityPermissionsDispatcher.startReceivingLocationUpdatesWithCheck(this);
+        MainActivityPermissionsDispatcher.startReceivingLocationUpdatesWithPermissionCheck(this);
     }
 
     @Override
@@ -114,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements VenuesContract.Ve
                 });
     }
 
-    @OnShowRationale(Manifest.permission.ACCESS_FINE_LOCATION)
+    @OnShowRationale({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
     void showRationaleForLocation(final PermissionRequest request) {
         new AlertDialog.Builder(this)
                 .setMessage("location rationale")
@@ -146,8 +147,6 @@ public class MainActivity extends AppCompatActivity implements VenuesContract.Ve
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        ButterKnife.unbind(this);
         presenter.detach();
     }
 
