@@ -1,6 +1,7 @@
 package com.mumanit.bontestapp.ui;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.location.Location;
 import android.os.Bundle;
@@ -97,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements VenuesContract.Ve
         MainActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
     }
 
+    @SuppressLint("MissingPermission")
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
     public void startReceivingLocationUpdates() {
 
