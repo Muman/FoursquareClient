@@ -25,6 +25,7 @@ class VenuesDataManagerImpl(private val foursquareApi: FoursquareApi, private va
     }
 
     override suspend fun getVenuesSuspend(): List<VenueData> {
-        return foursquareApi.
+        val cached = venuesCache.loadVenuesSuspend();
+        return cached
     }
 }

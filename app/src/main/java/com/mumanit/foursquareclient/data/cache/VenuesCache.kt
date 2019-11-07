@@ -12,4 +12,5 @@ interface VenuesCache {
     fun save(venueDataList: List<VenueData>)
     //Observable<Boolean> save(List<VenueData> venueDataList);
     fun loadVenues(): Observable<List<VenueData>>
+    suspend fun loadVenuesSuspend() : List<VenueData>
 }
