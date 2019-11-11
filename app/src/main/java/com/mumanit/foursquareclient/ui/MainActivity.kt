@@ -2,6 +2,7 @@ package com.mumanit.foursquareclient.ui
 
 import android.Manifest
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -9,15 +10,16 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.gms.location.LocationRequest
 import com.mumanit.foursquareclient.R
 import com.mumanit.foursquareclient.app.App
 import com.mumanit.foursquareclient.domain.model.VenueData
+import com.mumanit.foursquareclient.ui.base.RecyclerItemDivider
 import com.mumanit.foursquareclient.ui.venues.VenuesListAdapter
 import com.mumanit.foursquareclient.ui.venues.VenuesViewModel
 import com.mumanit.foursquareclient.ui.viewmodel.ViewModelFactory
+import kotlinx.android.synthetic.main.activity_main.*
 import permissions.dispatcher.*
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider
 import rx.Subscription
@@ -26,9 +28,6 @@ import javax.inject.Inject
 
 @RuntimePermissions
 class MainActivity : AppCompatActivity() {
-
-    @BindView(R.id.rvVenuesList)
-    internal lateinit var rvVenuesList: RecyclerView
 
     @Inject
     internal lateinit var locationProvider: ReactiveLocationProvider
@@ -40,7 +39,7 @@ class MainActivity : AppCompatActivity() {
     internal lateinit var locationUpdateConfig: LocationRequest
 
     internal lateinit var venuesListAdapter: VenuesListAdapter
-    internal lateinit var venuesListLayoutManager: LinearLayoutManager
+
     internal var locationSubscription: Subscription? = null
 
     private lateinit var viewModel: VenuesViewModel
@@ -54,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         initAdapter()
         initRecycler()
         initViewModel()
+        startObservingViewModel()
     }
 
     private fun initViewModel() {
@@ -69,14 +69,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initRecycler() {
-        venuesListLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-        rvVenuesList.layoutManager = venuesListLayoutManager
+        rvVenuesList.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         rvVenuesList.adapter = venuesListAdapter
+        rvVenuesList.addItemDecoration(RecyclerItemDivider(this))
     }
 
     override fun onStart() {
         super.onStart()
-        startReceivingLocationUpdates()
+        startReceivingLocationUpdatesWithPermissionCheck()
     }
 
     override fun onStop() {
@@ -92,10 +92,10 @@ class MainActivity : AppCompatActivity() {
 
     @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
     fun startReceivingLocationUpdates() {
+        viewModel.loadVenues()
         locationSubscription = locationProvider
                 .getUpdatedLocation(locationUpdateConfig)
                 .subscribe({
-                    viewModel.loadVenues()
                 }, { })
     }
 
@@ -125,19 +125,14 @@ class MainActivity : AppCompatActivity() {
     private fun showVenuesList(venueDataList: List<VenueData>?) {
         venuesListAdapter.data = venueDataList
         venuesListAdapter.notifyDataSetChanged()
-        Toast.makeText(this, "data loaded", Toast.LENGTH_LONG).show()
     }
 
-    private fun showLoading() {
-
+    private fun showLoading(show: Boolean) {
+        progress.visibility = if (show) View.VISIBLE else View.GONE
     }
 
-    private fun hideLoading() {
-
-    }
-
-    private fun showError() {
-        Toast.makeText(this, "loading error", Toast.LENGTH_LONG).show()
+    private fun showError(show: Boolean) {
+        error.visibility = if (show) View.VISIBLE else View.GONE
     }
 
     private val venuesObserver = Observer<List<VenueData>> { t -> showVenuesList(t) }

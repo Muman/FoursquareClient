@@ -1,23 +1,24 @@
 package com.mumanit.foursquareclient.ui.venues;
 
 import android.content.Context;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.mumanit.foursquareclient.R;
 import com.mumanit.foursquareclient.domain.model.VenueData;
 import com.squareup.picasso.Picasso;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-/**
- * Created by pmuciek on 7/9/17.
- */
 
 public class VenuesListAdapter extends RecyclerView.Adapter<VenuesListAdapter.VenueItemViewHolder> {
 
@@ -37,16 +38,15 @@ public class VenuesListAdapter extends RecyclerView.Adapter<VenuesListAdapter.Ve
         return mDataset;
     }
 
+    @NotNull
     @Override
     public VenueItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_venue_item, parent, false);
-
         return new VenueItemViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(final VenueItemViewHolder holder, int position) {
+    public void onBindViewHolder(@NotNull final VenueItemViewHolder holder, int position) {
         bindViews(holder, position);
     }
 
@@ -60,7 +60,7 @@ public class VenuesListAdapter extends RecyclerView.Adapter<VenuesListAdapter.Ve
         if (null != venue.photoUrl) {
             Picasso.with(mContext).load(venue.photoUrl).into(holder.ivVenueImage);
         } else {
-            Picasso.with(mContext).load(android.R.drawable.arrow_up_float).into(holder.ivVenueImage); // TODO: 7/11/17 provide better placeholder
+            Picasso.with(mContext).load(android.R.drawable.ic_dialog_map).into(holder.ivVenueImage);
         }
 
     }

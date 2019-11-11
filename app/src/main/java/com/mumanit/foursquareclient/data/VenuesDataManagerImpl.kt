@@ -1,31 +1,46 @@
 package com.mumanit.foursquareclient.data
 
+import android.location.Location
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.mumanit.foursquareclient.data.api.FoursquareApi
 import com.mumanit.foursquareclient.data.cache.VenuesCache
 import com.mumanit.foursquareclient.data.mappers.VenueDataMapper
 import com.mumanit.foursquareclient.domain.model.VenueData
-import pl.charmas.android.reactivelocation.ReactiveLocationProvider
-import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
-class VenuesDataManagerImpl(private val foursquareApi: FoursquareApi, private val venueDataMapper: VenueDataMapper, private val venuesCache: VenuesCache, private val locationProvider: ReactiveLocationProvider, private val clientId: String, private val clientSecret: String) : VenuesDataManager {
+class VenuesDataManagerImpl(
+        private val foursquareApi: FoursquareApi,
+        private val venueDataMapper: VenueDataMapper,
+        private val venuesCache: VenuesCache,
+        private val coroutineLocationProvider: FusedLocationProviderClient,
+        private val clientId: String,
+        private val clientSecret: String) : VenuesDataManager {
 
-    override fun getVenues(): Observable<List<VenueData>> {
+    override suspend fun getVenues(): List<VenueData> {
+        val location = getUserLocation()
+        val response = withContext(Dispatchers.IO) {
+           foursquareApi.exploreVenuesSuspend(clientId, clientSecret, location.latitude.toString() + "," + location.longitude.toString())
+        }
 
-        val cached = venuesCache.loadVenues()
-        cached.subscribeOn(Schedulers.computation())
+        val newData = venueDataMapper.map(response)
+        venuesCache.save(newData)
 
-        val api = locationProvider
-                .lastKnownLocation
-                .observeOn(Schedulers.io())
-                .concatMap { location -> foursquareApi.exploreVenues(clientId, clientSecret, location.latitude.toString() + "," + location.longitude.toString()) }.map { foursquareJSON -> venueDataMapper.map(foursquareJSON) }.doOnNext { venueDatas -> venuesCache.save(venueDatas) }.subscribeOn(Schedulers.io())
-
-        return Observable.concat(cached, api).observeOn(AndroidSchedulers.mainThread(), true)
+        return newData
     }
 
-    override suspend fun getVenuesSuspend(): List<VenueData> {
-        val cached = venuesCache.loadVenuesSuspend();
-        return cached
+    private suspend fun getUserLocation() : Location {
+        return suspendCoroutine {continuation ->
+            coroutineLocationProvider.lastLocation.addOnSuccessListener {
+                continuation.resume(it)
+            }
+
+            coroutineLocationProvider.lastLocation.addOnFailureListener {
+                continuation.resumeWithException(it)
+            }
+        }
     }
 }

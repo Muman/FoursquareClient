@@ -26,7 +26,7 @@ class VenuesSharedPrefCache : VenuesCache {
     }
 
     override suspend fun loadVenuesSuspend(): List<VenueData> {
-        return withContext(Dispatchers.Default) {
+        return withContext(Dispatchers.IO) {
             Hawk.get<List<VenueData>>(CACHE_TAG, emptyList())
         }
     }

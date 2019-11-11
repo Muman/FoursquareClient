@@ -1,37 +1,26 @@
 package com.mumanit.foursquareclient.dagger.modules
 
 import android.content.Context
-
-import com.facebook.stetho.okhttp3.StethoInterceptor
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
+import com.google.android.gms.location.LocationServices
 import com.mumanit.foursquareclient.dagger.qualifiers.ClientId
 import com.mumanit.foursquareclient.dagger.qualifiers.ClientSecretKey
-import com.mumanit.foursquareclient.dagger.qualifiers.Foursquare
-import com.mumanit.foursquareclient.data.cache.VenuesCache
 import com.mumanit.foursquareclient.data.VenuesDataManager
 import com.mumanit.foursquareclient.data.VenuesDataManagerImpl
+import com.mumanit.foursquareclient.data.api.FoursquareApi
+import com.mumanit.foursquareclient.data.cache.VenuesCache
 import com.mumanit.foursquareclient.data.cache.VenuesSharedPrefCache
 import com.mumanit.foursquareclient.data.mappers.VenueDataMapper
 import com.mumanit.foursquareclient.data.mappers.VenueDataMapperImpl
 import com.mumanit.foursquareclient.domain.GetVenuesInteractor
 import com.mumanit.foursquareclient.domain.GetVenuesInteractorImpl
-import com.mumanit.foursquareclient.ui.venues.VenuesListPresenter
-import com.mumanit.foursquareclient.ui.venues.VenuesListPresenterImpl
-import com.mumanit.foursquareclient.data.api.FoursquareApi
-import javax.inject.Singleton
-
 import dagger.Module
 import dagger.Provides
-import okhttp3.Cache
-import okhttp3.OkHttpClient
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Singleton
 
-@Module(includes = [ViewModelModule::class])
+@Module(includes = [ViewModelModule::class, NetworkingModule::class])
 class AppModule(private val context: Context) {
 
     @Provides
@@ -42,64 +31,14 @@ class AppModule(private val context: Context) {
 
     @Singleton
     @Provides
-    fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient()
-                .newBuilder()
-                .addNetworkInterceptor(StethoInterceptor())
-                .cache(Cache(context.cacheDir, 250000000))
-                .build()
-    }
-
-    @Singleton
-    @Provides
-    fun provideGson(): Gson {
-        return GsonBuilder()
-                .excludeFieldsWithoutExposeAnnotation()
-                .create()
-    }
-
-    @Singleton
-    @Provides
-    internal fun provideFoursquareApi(gson: Gson, okHttpClient: OkHttpClient, @Foursquare url: String): FoursquareApi {
-
-        val retrofit = Retrofit.Builder()
-                .baseUrl(url)
-                .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .build()
-
-        return retrofit.create(FoursquareApi::class.java)
-    }
-
-    @Provides
-    @Foursquare
-    internal fun provideFoursquareBaseUrl(): String {
-        return "https://api.foursquare.com/v2/"
-    }
-
-    @Provides
-    @ClientSecretKey
-    internal fun provideClientSecretKey(): String {
-        return "JCBDNKFN3W1JXAIPSCL4J5Y2HF2ZJJU0NS2N1YJ5CVHBABFW"
-    }
-
-    @Provides
-    @ClientId
-    internal fun provideClientId(): String {
-        return "XKKJLP3WXETHVZ3SCALGJGPL3HFNDVQ5IQBTVHD0JGQEHJMI"
-    }
-
-    @Singleton
-    @Provides
     internal fun provideVenuesDataManager(foursquareApi: FoursquareApi,
                                           venueDataMapper: VenueDataMapper,
                                           venuesCache: VenuesCache,
-                                          locationProvider: ReactiveLocationProvider,
+                                          fusedLocationProvider: FusedLocationProviderClient,
                                           @ClientId clientId: String,
                                           @ClientSecretKey clientSecret: String): VenuesDataManager {
 
-        return VenuesDataManagerImpl(foursquareApi, venueDataMapper, venuesCache, locationProvider, clientId, clientSecret)
+        return VenuesDataManagerImpl(foursquareApi, venueDataMapper, venuesCache, fusedLocationProvider, clientId, clientSecret)
     }
 
     @Singleton
@@ -109,14 +48,15 @@ class AppModule(private val context: Context) {
     }
 
     @Provides
-    internal fun provideVenuesListPresenter(getVenuesInteractor: GetVenuesInteractor): VenuesListPresenter {
-        return VenuesListPresenterImpl(getVenuesInteractor)
+    @Singleton
+    internal fun provideVenueDataMapper(): VenueDataMapper {
+        return VenueDataMapperImpl()
     }
 
     @Provides
     @Singleton
-    internal fun provideVenueDataMapper(): VenueDataMapper {
-        return VenueDataMapperImpl()
+    internal fun provideFusedLocationProvider(context: Context): FusedLocationProviderClient {
+        return LocationServices.getFusedLocationProviderClient(context)
     }
 
     @Provides

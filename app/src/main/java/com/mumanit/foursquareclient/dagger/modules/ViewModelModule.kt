@@ -18,5 +18,5 @@ abstract class ViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(VenuesViewModel::class)
-    internal abstract fun bindTracksViewModel(venuesViewModel: VenuesViewModel): ViewModel
+    internal abstract fun bindVenuesViewModel(venuesViewModel: VenuesViewModel): ViewModel
 }
