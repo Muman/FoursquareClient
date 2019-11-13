@@ -6,8 +6,14 @@ import com.mumanit.foursquareclient.data.api.FoursquareApi
 import com.mumanit.foursquareclient.data.cache.VenuesCache
 import com.mumanit.foursquareclient.data.mappers.VenueDataMapper
 import com.mumanit.foursquareclient.domain.model.VenueData
+import com.mumanit.foursquareclient.domain.model.VenueMenu
+import com.mumanit.foursquareclient.domain.model.VenueWithMenu
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import java.lang.RuntimeException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -20,16 +26,37 @@ class VenuesDataManagerImpl(
         private val clientId: String,
         private val clientSecret: String) : VenuesDataManager {
 
-    override suspend fun getVenues(): List<VenueData> {
+    override suspend fun getVenueMenu(id: String): VenueMenu? {
+        val menu = withContext(Dispatchers.IO) {
+            foursquareApi.menuDetails(id, clientId, clientSecret)
+        }
+
+        return VenueMenu(menu.menuId, menu.description, menu.name)
+    }
+
+    override suspend fun getRecommendedVenues(): List<VenueData> {
         val location = getUserLocation()
+
         val response = withContext(Dispatchers.IO) {
-           foursquareApi.exploreVenuesSuspend(clientId, clientSecret, location.latitude.toString() + "," + location.longitude.toString())
+            foursquareApi.exploreVenues(clientId, clientSecret,location.latitude.toString() + "," + location.longitude.toString())
         }
 
         val newData = venueDataMapper.map(response)
         venuesCache.save(newData)
 
         return newData
+    }
+
+    override suspend fun getFirstRecommendedVenuWithMenuDetails(): VenueWithMenu {
+        val firstRecommendedVenue = getRecommendedVenues().firstOrNull()
+
+        if (null != firstRecommendedVenue) {
+            val menuForRecommendedVenue = getVenueMenu(firstRecommendedVenue.id)
+
+            return VenueWithMenu(menuForRecommendedVenue, firstRecommendedVenue)
+
+        } else throw RuntimeException("no recommended venue found")
+
     }
 
     private suspend fun getUserLocation() : Location {
@@ -42,5 +69,21 @@ class VenuesDataManagerImpl(
                 continuation.resumeWithException(it)
             }
         }
+    }
+
+    override fun getRecommendedVenuesWithFlow(): Flow<List<VenueData>> {
+        return flow {
+            val location = getUserLocation()
+
+            val response = withContext(Dispatchers.IO) {
+                foursquareApi.exploreVenues(clientId, clientSecret, location.latitude.toString() + "," + location.longitude.toString())
+            }
+
+            val newData = venueDataMapper.map(response)
+            venuesCache.save(newData)
+
+            emit(newData)
+        }
+
     }
 }

@@ -13,6 +13,8 @@ import com.mumanit.foursquareclient.data.cache.VenuesCache
 import com.mumanit.foursquareclient.data.cache.VenuesSharedPrefCache
 import com.mumanit.foursquareclient.data.mappers.VenueDataMapper
 import com.mumanit.foursquareclient.data.mappers.VenueDataMapperImpl
+import com.mumanit.foursquareclient.domain.GetFirstRecommendedVenueWithMenuInteractor
+import com.mumanit.foursquareclient.domain.GetFirstRecommendedVenueWithMenuImpl
 import com.mumanit.foursquareclient.domain.GetVenuesInteractor
 import com.mumanit.foursquareclient.domain.GetVenuesInteractorImpl
 import dagger.Module
@@ -45,6 +47,12 @@ class AppModule(private val context: Context) {
     @Provides
     internal fun provideGetVenuesInteractor(venuesDataManager: VenuesDataManager): GetVenuesInteractor {
         return GetVenuesInteractorImpl(venuesDataManager)
+    }
+
+    @Singleton
+    @Provides
+    internal fun provideGetMostRecommendedVenueInteractor(venuesDataManager: VenuesDataManager): GetFirstRecommendedVenueWithMenuInteractor {
+        return GetFirstRecommendedVenueWithMenuImpl(venuesDataManager)
     }
 
     @Provides

@@ -11,8 +11,9 @@ class VenueDataMapperImpl : VenueDataMapper {
         val photoUrl = getPhotoUrl(foursquareVenue)
         val name = foursquareVenue.name
         val checkinsCount = foursquareVenue.stats.checkinsCount
+        val id = foursquareVenue.id
 
-        return VenueData(checkinsCount, name, photoUrl)
+        return VenueData(checkinsCount, name, photoUrl, id)
     }
 
     override fun map(foursquareVenueList: List<FoursquareVenue>): List<VenueData> {
