@@ -9,9 +9,7 @@ import com.mumanit.foursquareclient.domain.model.VenueData
 import com.mumanit.foursquareclient.domain.model.VenueMenu
 import com.mumanit.foursquareclient.domain.model.VenueWithMenu
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import java.lang.RuntimeException
 import kotlin.coroutines.resume
@@ -47,7 +45,7 @@ class VenuesDataManagerImpl(
         return newData
     }
 
-    override suspend fun getFirstRecommendedVenuWithMenuDetails(): VenueWithMenu {
+    override suspend fun getRecommendedVenueWithMenu(): VenueWithMenu {
         val firstRecommendedVenue = getRecommendedVenues().firstOrNull()
 
         if (null != firstRecommendedVenue) {
@@ -71,19 +69,33 @@ class VenuesDataManagerImpl(
         }
     }
 
+    private fun getUserLocationWithFlow(): Flow<Location> {
+        return flow {
+            emit(getUserLocation())
+        }
+    }
+
+    override fun getRecommendedVenueWithMenuWithFLow(): Flow<VenueWithMenu> {
+        return getUserLocationWithFlow()
+                .map { location -> foursquareApi.exploreVenues(clientId, clientSecret, location.latitude.toString() + "," + location.longitude.toString()) }
+                .flowOn(Dispatchers.IO)
+                .map {response -> venueDataMapper.map(response) }
+                .flowOn(Dispatchers.Default)
+                .map {
+                    it.firstOrNull()
+                }
+                .zip(getVenueMenu())
+                .map()
+    }
+
     override fun getRecommendedVenuesWithFlow(): Flow<List<VenueData>> {
         return flow {
             val location = getUserLocation()
-
-            val response = withContext(Dispatchers.IO) {
-                foursquareApi.exploreVenues(clientId, clientSecret, location.latitude.toString() + "," + location.longitude.toString())
-            }
-
+            val response = foursquareApi.exploreVenues(clientId, clientSecret, location.latitude.toString() + "," + location.longitude.toString())
             val newData = venueDataMapper.map(response)
             venuesCache.save(newData)
-
             emit(newData)
-        }
+        }.flowOn(Dispatchers.IO)
 
     }
 }
