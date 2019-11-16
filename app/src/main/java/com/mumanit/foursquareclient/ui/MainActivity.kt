@@ -15,7 +15,6 @@ import com.google.android.gms.location.LocationRequest
 import com.mumanit.foursquareclient.R
 import com.mumanit.foursquareclient.app.App
 import com.mumanit.foursquareclient.domain.model.VenueData
-import com.mumanit.foursquareclient.ui.base.RecyclerItemDivider
 import com.mumanit.foursquareclient.ui.venues.VenuesListAdapter
 import com.mumanit.foursquareclient.ui.venues.VenuesViewModel
 import com.mumanit.foursquareclient.ui.viewmodel.ViewModelFactory
@@ -71,7 +70,6 @@ class MainActivity : AppCompatActivity() {
     private fun initRecycler() {
         rvVenuesList.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         rvVenuesList.adapter = venuesListAdapter
-        rvVenuesList.addItemDecoration(RecyclerItemDivider(this))
     }
 
     override fun onStart() {
