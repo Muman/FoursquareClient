@@ -6,17 +6,17 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.mumanit.foursquareclient.dagger.qualifiers.ClientId
 import com.mumanit.foursquareclient.dagger.qualifiers.ClientSecretKey
-import com.mumanit.foursquareclient.data.VenuesDataManager
-import com.mumanit.foursquareclient.data.VenuesDataManagerImpl
+import com.mumanit.foursquareclient.data.VenuesRepository
+import com.mumanit.foursquareclient.data.VenuesRepositoryImpl
 import com.mumanit.foursquareclient.data.api.FoursquareApi
 import com.mumanit.foursquareclient.data.cache.VenuesCache
 import com.mumanit.foursquareclient.data.cache.VenuesSharedPrefCache
 import com.mumanit.foursquareclient.data.mappers.VenueDataMapper
 import com.mumanit.foursquareclient.data.mappers.VenueDataMapperImpl
-import com.mumanit.foursquareclient.domain.GetFirstRecommendedVenueWithMenuInteractor
+import com.mumanit.foursquareclient.domain.GetFirstRecommendedVenueWithMenu
 import com.mumanit.foursquareclient.domain.GetFirstRecommendedVenueWithMenuImpl
-import com.mumanit.foursquareclient.domain.GetVenuesInteractor
-import com.mumanit.foursquareclient.domain.GetVenuesInteractorImpl
+import com.mumanit.foursquareclient.domain.GetVenues
+import com.mumanit.foursquareclient.domain.GetVenuesImpl
 import dagger.Module
 import dagger.Provides
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider
@@ -38,20 +38,20 @@ class AppModule(private val context: Context) {
                                           venuesCache: VenuesCache,
                                           fusedLocationProvider: FusedLocationProviderClient,
                                           @ClientId clientId: String,
-                                          @ClientSecretKey clientSecret: String): VenuesDataManager {
+                                          @ClientSecretKey clientSecret: String): VenuesRepository {
 
-        return VenuesDataManagerImpl(foursquareApi, venueDataMapper, venuesCache, fusedLocationProvider, clientId, clientSecret)
+        return VenuesRepositoryImpl(foursquareApi, venueDataMapper, venuesCache, fusedLocationProvider, clientId, clientSecret)
     }
 
     @Singleton
     @Provides
-    internal fun provideGetVenuesInteractor(venuesDataManager: VenuesDataManager): GetVenuesInteractor {
-        return GetVenuesInteractorImpl(venuesDataManager)
+    internal fun provideGetVenuesInteractor(venuesDataManager: VenuesRepository): GetVenues {
+        return GetVenuesImpl(venuesDataManager)
     }
 
     @Singleton
     @Provides
-    internal fun provideGetMostRecommendedVenueInteractor(venuesDataManager: VenuesDataManager): GetFirstRecommendedVenueWithMenuInteractor {
+    internal fun provideGetMostRecommendedVenueInteractor(venuesDataManager: VenuesRepository): GetFirstRecommendedVenueWithMenu {
         return GetFirstRecommendedVenueWithMenuImpl(venuesDataManager)
     }
 

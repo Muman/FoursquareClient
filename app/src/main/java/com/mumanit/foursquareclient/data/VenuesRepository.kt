@@ -5,10 +5,10 @@ import com.mumanit.foursquareclient.domain.model.VenueMenu
 import com.mumanit.foursquareclient.domain.model.VenueWithMenu
 import kotlinx.coroutines.flow.Flow
 
-interface VenuesDataManager {
-    suspend fun getRecommendedVenues() : List<VenueData>
+interface VenuesRepository {
+    suspend fun geNearbyRecommendedVenues() : List<VenueData>
     suspend fun getVenueMenu(id: String) : VenueMenu?
-    suspend fun getRecommendedVenueWithMenu(): VenueWithMenu
+    suspend fun getNearbyRecommendedVenueWithMenu(): VenueWithMenu
     fun getRecommendedVenueWithMenuWithFLow(): Flow<VenueWithMenu>
     fun getRecommendedVenuesWithFlow() : Flow<List<VenueData>>
 }

@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mumanit.foursquareclient.domain.GetFirstRecommendedVenueWithMenuInteractor
-import com.mumanit.foursquareclient.domain.GetVenuesInteractor
+import com.mumanit.foursquareclient.domain.GetFirstRecommendedVenueWithMenu
+import com.mumanit.foursquareclient.domain.GetVenues
 import com.mumanit.foursquareclient.domain.model.VenueData
 import com.mumanit.foursquareclient.domain.model.VenueWithMenu
 import kotlinx.coroutines.flow.collect
@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class VenuesViewModel @Inject constructor(
-        private val getVenuesInteractor: GetVenuesInteractor,
-        private val getFirstRecommendedVenueWithMenu: GetFirstRecommendedVenueWithMenuInteractor
+        private val getVenuesInteractor: GetVenues,
+        private val getFirstRecommendedVenueWithMenu: GetFirstRecommendedVenueWithMenu
 ) : ViewModel() {
 
     private val _venues = MutableLiveData<List<VenueData>>()
@@ -32,21 +32,15 @@ class VenuesViewModel @Inject constructor(
                 _venues.postValue(it)
             }
         }
-
-        /* suspended function
-
-        viewModelScope.launch {
-            val venues = getVenuesInteractor.getRecommendedVenues()
-            _venues.postValue(venues)
-        }
-
-        */
     }
 
     private fun loadMostRecommendedVenueWithMenu() {
         viewModelScope.launch {
-            val mostRecommendedVenueWithMenu = getFirstRecommendedVenueWithMenu.getFirstVenueWithMenu()
-            _mostRecommendedVenueWithMenu.postValue(mostRecommendedVenueWithMenu)
+            getFirstRecommendedVenueWithMenu
+                    .getFirstVenueWithMenu()
+                    .collect { mostRecommendedVenueWithMenu ->
+                        _mostRecommendedVenueWithMenu.postValue(mostRecommendedVenueWithMenu)
+                    }
         }
     }
 
