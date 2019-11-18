@@ -1,12 +1,12 @@
 package com.mumanit.foursquareclient.data.cache
 
-import com.mumanit.foursquareclient.domain.model.VenueData
+import com.mumanit.foursquareclient.domain.model.VenueDomainModel
 
 import rx.Observable
 
 interface VenuesCache {
-    fun save(venueDataList: List<VenueData>)
-    //Observable<Boolean> save(List<VenueData> venueDataList);
-    fun loadVenues(): Observable<List<VenueData>>
-    suspend fun loadVenuesSuspend() : List<VenueData>
+    fun save(venueDataList: List<VenueDomainModel>)
+    //Observable<Boolean> save(List<VenueDomainModel> venueDataList);
+    fun loadVenues(): Observable<List<VenueDomainModel>>
+    suspend fun loadVenuesSuspend() : List<VenueDomainModel>
 }
