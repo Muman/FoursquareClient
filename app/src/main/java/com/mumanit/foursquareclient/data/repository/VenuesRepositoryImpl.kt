@@ -3,7 +3,8 @@ package com.mumanit.foursquareclient.data.repository
 import android.location.Location
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.mumanit.foursquareclient.data.api.FoursquareApi
-import com.mumanit.foursquareclient.data.cache.VenuesCache
+import com.mumanit.foursquareclient.data.db.dao.VenuesDao
+import com.mumanit.foursquareclient.data.db.entity.VenueEntity
 import com.mumanit.foursquareclient.data.mappers.VenueDataMapper
 import com.mumanit.foursquareclient.domain.model.VenueDomainModel
 import com.mumanit.foursquareclient.domain.model.VenueMenuDomainModel
@@ -21,7 +22,7 @@ import kotlin.coroutines.suspendCoroutine
 class VenuesRepositoryImpl(
         private val foursquareApi: FoursquareApi,
         private val venueDataMapper: VenueDataMapper,
-        private val venuesCache: VenuesCache,
+        private val venuesDao: VenuesDao,
         private val coroutineLocationProvider: FusedLocationProviderClient,
         private val clientId: String,
         private val clientSecret: String) : VenuesRepository {
@@ -42,7 +43,12 @@ class VenuesRepositoryImpl(
         }
 
         val newData = venueDataMapper.map(response)
-        venuesCache.save(newData)
+
+        val entities = newData.map {
+            VenueEntity(it.id, it.name,"", location.latitude, location.longitude)
+        }
+
+        venuesDao.replaceAllWith(entities)
 
         return newData
     }
@@ -97,7 +103,13 @@ class VenuesRepositoryImpl(
             val location = getUserLocation()
             val response = foursquareApi.exploreVenues(clientId, clientSecret, location.latitude.toString() + "," + location.longitude.toString())
             val newData = venueDataMapper.map(response)
-            venuesCache.save(newData)
+
+            val entities = newData.map {
+                VenueEntity(it.id, it.name,"", location.latitude, location.longitude)
+            }
+
+            venuesDao.replaceAllWith(entities)
+
             emit(newData)
         }.flowOn(Dispatchers.IO)
     }
