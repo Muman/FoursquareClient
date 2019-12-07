@@ -51,8 +51,15 @@ class MainActivity : AppCompatActivity() {
         injectDependencies()
         initAdapter()
         initRecycler()
+        initSwipeRefresher()
         initViewModel()
         startObservingViewModel()
+    }
+
+    private fun initSwipeRefresher() {
+        swipeRefresher.setOnRefreshListener {
+            viewModel.loadData()
+        }
     }
 
     private fun initViewModel() {
@@ -133,6 +140,9 @@ class MainActivity : AppCompatActivity() {
         error.visibility = if (show) View.VISIBLE else View.GONE
     }
 
-    private val venuesObserver = Observer<List<VenueDomainModel>> { t -> showVenuesList(t) }
+    private val venuesObserver = Observer<List<VenueDomainModel>> { t ->
+        swipeRefresher.isRefreshing = false
+        showVenuesList(t)
+    }
 
 }
