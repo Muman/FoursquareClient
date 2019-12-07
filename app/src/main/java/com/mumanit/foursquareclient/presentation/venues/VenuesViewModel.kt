@@ -1,5 +1,6 @@
 package com.mumanit.foursquareclient.presentation.venues
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,7 @@ import com.mumanit.foursquareclient.domain.interactor.GetFirstRecommendedVenueWi
 import com.mumanit.foursquareclient.domain.interactor.GetRecommendedVenues
 import com.mumanit.foursquareclient.domain.model.VenueDomainModel
 import com.mumanit.foursquareclient.domain.model.VenueWithMenuDomainModel
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,7 +30,11 @@ class VenuesViewModel @Inject constructor(
 
     private fun loadVenues() {
         viewModelScope.launch {
-            getVenuesInteractor.executeWithFlow().collect {
+            getVenuesInteractor.executeWithFlow()
+                    .catch { error ->
+                        Log.e("error", error.message)
+                    }
+                    .collect {
                 _venues.postValue(it)
             }
         }
@@ -37,6 +43,9 @@ class VenuesViewModel @Inject constructor(
     private fun loadMostRecommendedVenueWithMenu() {
         viewModelScope.launch {
             getFirstRecommendedVenueWithMenu.execute()
+                    .catch { error ->
+                        Log.e("error", error.message)
+                    }
                     .collect { venueWithMenu -> _mostRecommendedVenueWithMenu.postValue(venueWithMenu) }
         }
     }
