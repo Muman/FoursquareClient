@@ -11,6 +11,7 @@ import com.mumanit.foursquareclient.data.repository.VenuesRepositoryImpl
 import com.mumanit.foursquareclient.data.api.FoursquareApi
 import com.mumanit.foursquareclient.data.cache.VenuesCache
 import com.mumanit.foursquareclient.data.cache.VenuesSharedPrefCache
+import com.mumanit.foursquareclient.data.db.dao.VenuesDao
 import com.mumanit.foursquareclient.data.mappers.VenueDataMapper
 import com.mumanit.foursquareclient.data.mappers.VenueDataMapperImpl
 import com.mumanit.foursquareclient.domain.interactor.GetFirstRecommendedVenueWithMenu
@@ -22,7 +23,7 @@ import dagger.Provides
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider
 import javax.inject.Singleton
 
-@Module(includes = [ViewModelModule::class, NetworkingModule::class])
+@Module(includes = [ViewModelModule::class, NetworkingModule::class, DatabaseModule::class])
 class AppModule(private val context: Context) {
 
     @Provides
@@ -35,12 +36,12 @@ class AppModule(private val context: Context) {
     @Provides
     internal fun provideVenuesDataManager(foursquareApi: FoursquareApi,
                                           venueDataMapper: VenueDataMapper,
-                                          venuesCache: VenuesCache,
+                                          venuesDao: VenuesDao,
                                           fusedLocationProvider: FusedLocationProviderClient,
                                           @ClientId clientId: String,
                                           @ClientSecretKey clientSecret: String): VenuesRepository {
 
-        return VenuesRepositoryImpl(foursquareApi, venueDataMapper, venuesCache, fusedLocationProvider, clientId, clientSecret)
+        return VenuesRepositoryImpl(foursquareApi, venueDataMapper, venuesDao, fusedLocationProvider, clientId, clientSecret)
     }
 
     @Singleton
