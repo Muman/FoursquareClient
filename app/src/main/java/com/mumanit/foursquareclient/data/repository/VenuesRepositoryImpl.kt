@@ -83,7 +83,6 @@ class VenuesRepositoryImpl(
         }
     }
 
-    @ExperimentalCoroutinesApi
     override fun getRecommendedVenueWithMenuWithFLow(): Flow<VenueWithMenuDomainModel> {
         return getUserLocationWithFlow()
                 .map { location -> foursquareApi.exploreVenues(clientId, clientSecret, location.latitude.toString() + "," + location.longitude.toString()) }
@@ -102,15 +101,15 @@ class VenuesRepositoryImpl(
         return flow {
             val location = getUserLocation()
             val response = foursquareApi.exploreVenues(clientId, clientSecret, location.latitude.toString() + "," + location.longitude.toString())
-            val newData = venueDataMapper.map(response)
+            val mappedResponse = venueDataMapper.map(response)
 
-            val entities = newData.map {
-                VenueEntity(it.id, it.name,"", location.latitude, location.longitude)
+            val entities = mappedResponse.map {
+                VenueEntity(it.id, it.name)
             }
 
             venuesDao.replaceAllWith(entities)
 
-            emit(newData)
+            emit(mappedResponse)
         }.flowOn(Dispatchers.IO)
     }
 }

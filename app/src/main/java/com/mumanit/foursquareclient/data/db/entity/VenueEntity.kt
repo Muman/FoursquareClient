@@ -14,13 +14,13 @@ data class VenueEntity(
     val name: String,
 
     @ColumnInfo(name = FIELD_IMAGE_PATH)
-    val imgPath: String?,
+    val imgPath: String? = null,
 
     @ColumnInfo(name = FIELD_POSITION_LAT)
-    val lat: Double,
+    val lat: Double? = null,
 
     @ColumnInfo(name = FIELD_POSITION_LANG)
-    val lang: Double
+    val lang: Double? = null
 ) {
     companion object {
         const val TABLE_NAME = "venues"
